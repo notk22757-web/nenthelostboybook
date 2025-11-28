@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>The Lost Boy Books</title>
+  <meta name="description" content="Where lost stories find their home">
+
+  <!-- PWA + Social + Favicon -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=192&h=192&fit=crop&crop=center">
+  <meta name="theme-color" content="#a86f4e">
+  <meta property="og:title" content="The Lost Boy Books">
+  <meta property="og:description" content="Original stories & poetry from a lost soul.">
+  <meta property="og:image" content="https://images.unsplash.com/photo-1517841905240-472988babdf9?w=1200&h=630&fit=crop">
+  <meta property="og:url" content="https://nenthelostboybooksimna.netlify.app">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Libre+Baskerville&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root{--bg:#faf6f0;--text:#2c1a0d;--accent:#a86f4e;--light:#f5ede2;--shadow:rgba(0,0,0,0.08);}
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:'Libre Baskerville',serif;background:var(--bg);color:var(--text);line-height:1.9;}
+    header{height:100vh;background:linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.7)),url('https://images.unsplash.com/photo-1491841573335-f7ba7945728b?ixlib=rb-4.0.3&auto=format&fit=crop&q=80')center/cover;display:flex;align-items:center;justify-content:center;text-align:center;color:white;}
+    .header-content h1{font-family:'Playfair Display',serif;font-size:5.5rem;letter-spacing:2px;text-shadow:0 8px 20px rgba(0,0,0,0.6);}
+    .header-content p{font-size:1.8rem;font-style:italic;opacity:0.9;}
+    .container{max-width:1100px;margin:0 auto;padding:4rem 2rem;}
+    .books-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:3rem;margin-top:6rem;}
+    .book-card{background:white;border-radius:20px;overflow:hidden;box-shadow:0 20px 40px var(--shadow);transition:all .6s;position:relative;}
+    .book-card:hover{transform:translateY(-20px) scale(1.03);box-shadow:0 30px 60px rgba(0,0,0,0.15);}
+    .book-cover{height:420px;background:var(--light) center/cover no-repeat;}
+    .book-title{font-family:'Playfair Display',serif;font-size:1.8rem;text-align:center;padding:1.5rem;}
+    .btn{padding:1rem 2.5rem;background:var(--accent);color:white;border:none;border-radius:50px;font-weight:600;transition:all .4s;cursor:pointer;}
+    .btn:hover{background:#8B4513;transform:scale(1.08);}
+    .btn-danger{background:#a33;}
+    .btn-secondary{background:#666;margin-left:0.5rem;}
+
+    #loginModal{display:flex;align-items:center;justify-content:center;position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:1000;}
+    .login-box{background:white;padding:4rem;border-radius:20px;text-align:center;max-width:420px;width:90%;box-shadow:0 30px 80px rgba(0,0,0,0.4);}
+    .close-btn{position:fixed;top:30px;right:30px;font-size:2.5rem;background:rgba(0,0,0,0.6);color:white;width:60px;height:60px;border-radius:50%;display:grid;place-items:center;cursor:pointer;z-index:1001;transition:.3s;}
+    .close-btn:hover{background:var(--accent);transform:rotate(90deg);}
+
+    #reader,#editor{display:none;position:fixed;inset:0;background:var(--bg);z-index:100;overflow-y:auto;padding:4rem 2rem;}
+    .chapter{max-width:800px;margin:0 auto 5rem;}
+    .chapter h2{font-family:'Playfair Display',serif;font-size:2.8rem;color:var(--accent);margin-bottom:1.5rem;}
+    .poem-text{text-align:center;font-style:italic;white-space:pre-line;line-height:2.4;font-size:1.35rem;max-width:600px;margin:2rem auto;}
+    .social-footer{text-align:center;padding:6rem 2rem;background:linear-gradient(to bottom,var(--bg),var(--light));font-family:'Playfair Display',serif;font-size:1.5rem;}
+    .social-footer a{color:var(--accent);text-decoration:none;margin:0 2rem;font-weight:bold;}
+    .social-footer a:hover{color:#8B4513;}
+    @media(max-width:768px){.header-content h1{font-size:3.8rem;}.header-content p{font-size:1.4rem;}.books-grid{grid-template-columns:1fr;}}
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="header-content">
+      <h1>The Lost Boy Books</h1>
+      <p>Where lost stories find their home</p>
+    </div>
+  </header>
+
+  <div class="container">
+    <div id="ownerControls" style="text-align:center;margin:5rem 0;display:none;">
+      <button class="btn" id="newBookBtn">+ Write a New Book</button>
+    </div>
+    <div class="books-grid" id="booksGrid"></div>
+  </div>
+
+  <!-- Login Modal -->
+  <div id="loginModal">
+    <div class="login-box">
+      <h2 style="font-family:'Playfair Display',serif;font-size:2.5rem;">Owner Access</h2>
+      <p style="margin-bottom:2rem;">Enter the secret password</p>
+      <input type="password" id="passwordInput" placeholder="••••••••" style="padding:1.2rem;font-size:1.2rem;border-radius:12px;"/>
+      <button class="btn" id="loginBtn" style="margin-top:1.5rem;padding:1.2rem 3rem;font-size:1.2rem;">Enter</button>
+      <p style="margin-top:2rem;color:#888;">Readers can just browse below.</p>
+      <button class="btn" style="background:none;border:2px solid var(--accent);color:var(--accent);" id="readerBtn">Continue as Reader</button>
+    </div>
+  </div>
+
+  <!-- Reader -->
+  <div id="reader"><div class="close-btn" onclick="this.parentElement.style.display='none'">×</div><div id="bookContent"></div></div>
+
+  <!-- Editor -->
+  <div id="editor">
+    <div class="close-btn" onclick="this.parentElement.style.display='none'">×</div>
+    <div class="container">
+      <div style="background:var(--bg);padding:2rem;position:sticky;top:0;z-index:10;border-bottom:2px solid #ddd;">
+        <input type="text" id="bookTitle" placeholder="Book / Poetry Collection Title..." style="font-size:2rem;width:100%;max-width:700px;padding:0.8rem;border:none;border-bottom:3px solid var(--accent);font-family:'Playfair Display',serif;">
+        <div style="margin:1.5rem 0;">
+          <button class="btn" onclick="document.getElementById('coverUpload').click()">Upload Cover</button>
+          <input type="file" id="coverUpload" accept="image/*" style="display:none;" onchange="uploadImage(this,'cover')">
+          <div id="coverPreview" style="margin-top:1rem;"></div>
+        </div>
+        <input type="hidden" id="coverUrl">
+        <button class="btn" onclick="saveBook()" style="padding:1rem 3rem;font-size:1.2rem;">Save Book</button>
+      </div>
+      <div id="chapters" style="margin-top:3rem;"></div>
+      <div style="text-align:center;margin:4rem 0;">
+        <button class="btn" onclick="addChapter()">+ Add Another Chapter / Poem</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Social Footer -->
+  <div class="social-footer">
+    Follow the lost boy<br><br>
+    <a href="https://pin.it/2G79AJHWA" target="_blank">Pinterest</a> • 
+    <a href="https://www.instagram.com/nekimna_ooo" target="_blank">Instagram</a>
+  </div>
+
+  <script type="module">
+    const firebaseConfig = { apiKey: "AIzaSyB3j5NIewe015RKMAdhD82ZHyDQYBOWCm8", authDomain: "the-lost-boy-books.firebaseapp.com", projectId: "the-lost-boy-books", storageBucket: "the-lost-boy-books.firebasestorage.app", messagingSenderId: "521527808956", appId: "1:521527808956:web:c0fb2764934179834751b9", measurementId: "G-X6ZN0LP77K" };
+    const OWNER_EMAIL = "llegends401@gmail.com";
+
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js';
+    import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js';
+    import { getFirestore, collection, getDocs, doc, getDoc, setDoc, addDoc, deleteDoc } from 'https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js';
+    import { getStorage, ref, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/12.6.0/firebase-storage.js';
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const storage = getStorage(app);
+    const booksRef = collection(db, 'books');
+    let isOwner = false, currentBookId = null;
+
+    onAuthStateChanged(auth, user => {
+      if (user && user.email === OWNER_EMAIL) {
+        isOwner = true;
+        document.getElementById('ownerControls').style.display = 'block';
+        document.getElementById('loginModal').style.display = 'none';
+        loadBooks();
+      }
+    });
+
+    // Image Upload
+    window.uploadImage = async (input, type) => {
+      const file = input.files[0]; if (!file) return;
+      document.getElementById('coverPreview').innerHTML = `<img src="${URL.createObjectURL(file)}" style="max-width:100%;border-radius:12px;margin-top:1rem;">`;
+      const storageRef = ref(storage, 'covers/' + Date.now() + '_' + file.name);
+      await uploadBytes(storageRef, file);
+      const url = await getDownloadURL(storageRef);
+      document.getElementById('coverUrl').value = url;
+    };
+
+    window.addImageToChapter = btn => {
+      const chapterDiv = btn.parentElement;
+      const input = document.createElement('input'); input.type = 'file'; input.accept = 'image/*'; input.style.display = 'none';
+      input.onchange = async () => {
+        const file = input.files[0]; if (!file) return;
+        chapterDiv.querySelector('.chapter-preview').innerHTML = `<img src="${URL.createObjectURL(file)}" style="max-width:100%;border-radius:12px;margin:1rem 0;">`;
+        const storageRef = ref(storage, 'images/' + Date.now() + '_' + file.name);
+        await uploadBytes(storageRef, file);
+        const url = await getDownloadURL(storageRef);
+        chapterDiv.querySelector('.chapter-image-url').value = url;
+      };
+      input.click();
+    };
+
+    async function loadBooks() {
+      const snapshot = await getDocs(booksRef);
+      const grid = document.getElementById('booksGrid'); grid.innerHTML = '';
+      snapshot.forEach(d => {
+        const book = d.data(); book.id = d.id;
+        const div = document.createElement('div'); div.className = 'book-card';
+        const cover = book.cover ? `background-image:url('${book.cover}')` : 'background:#e8d9c9';
+        let btns = `<button class="btn" onclick="openReader('${book.id}')">Read</button>`;
+        if (isOwner) btns += `<button class="btn btn-secondary" onclick="editBook('${book.id}')">Edit</button><button class="btn btn-danger" onclick="deleteBook('${book.id}')">Delete</button>`;
+        div.innerHTML = `<div class="book-cover" style="${cover}"></div>
+                         <div class="book-title">${book.title || 'Untitled'}</div>
+                         <div style="text-align:center;padding:1rem;">${btns}</div>`;
+        grid.appendChild(div);
+      });
+    }
+
+    window.openReader = async id => {
+      const snap = await getDoc(doc(db, 'books', id));
+      if (!snap.exists()) return;
+      const book = snap.data();
+      document.getElementById('bookContent').innerHTML = `<h1 style="text-align:center;font-size:3.5rem;margin:3rem 0;">${book.title}</h1>
+        ${book.cover ? `<img src="${book.cover}" style="width:100%;max-width:500px;border-radius:16px;margin:2rem auto;display:block;box-shadow:0 20px 40px rgba(0,0,0,0.2);">` : ''}
+        ${book.chapters.map(ch => `<div class="chapter"><h2>${ch.title||'Untitled'}</h2>${ch.image?`<img src="${ch.image}" style="max-width:100%;border-radius:12px;margin:2rem 0;">`:''}<p style="white-space:pre-wrap;font-size:1.3rem;line-height:2.2;">${ch.text.replace(/\n/g,'<br>')}</p></div>`).join('')}`;
+      document.getElementById('reader').style.display = 'block';
+    };
+
+    document.getElementById('loginBtn').onclick = () => {
+      const pwd = document.getElementById('passwordInput').value.trim();
+      if (pwd) signInWithEmailAndPassword(auth, OWNER_EMAIL, pwd).catch(() => alert('Wrong password'));
+    };
+    document.getElementById('readerBtn').onclick = () => { document.getElementById('loginModal').style.display = 'none'; loadBooks(); };
+    document.getElementById('newBookBtn').onclick = () => openEditor();
+
+    window.openEditor = async (id = null) => {
+      if (!isOwner) return;
+      currentBookId = id;
+      document.getElementById('editor').style.display = 'block';
+      document.getElementById('bookTitle').value = ''; document.getElementById('coverUrl').value = ''; document.getElementById('coverPreview').innerHTML = '';
+      document.getElementById('chapters').innerHTML = '';
+      addChapter();
+      if (id) {
+        const snap = await getDoc(doc(db, 'books', id));
+        if (snap.exists()) {
+          const b = snap.data();
+          document.getElementById('bookTitle').value = b.title || '';
+          if (b.cover) { document.getElementById('coverUrl').value = b.cover; document.getElementById('coverPreview').innerHTML = `<img src="${b.cover}" style="max-width:100%;border-radius:12px;margin-top:1rem;">`; }
+          document.getElementById('chapters').innerHTML = '';
+          b.chapters.forEach(ch => {
+            const div = document.createElement('div'); div.className = 'chapter';
+            div.innerHTML = `
+              <input type="text" class="chapter-title" value="${ch.title||''}" style="font-size:1.8rem;width:100%;padding:0.8rem;border:none;border-bottom:2px solid #ccc;margin-bottom:1rem;">
+              <textarea class="chapter-text" style="width:100%;min-height:300px;padding:1.5rem;border:1px solid #ddd;border-radius:12px;margin:1.5rem 0;font-size:1.1rem;">${ch.text||''}</textarea>
+              <button class="btn upload-btn" onclick="addImageToChapter(this)">Change Image</button>
+              ${ch.image ? `<div class="chapter-preview"><img src="${ch.image}" style="max-width:100%;border-radius:12px;margin:1rem 0;"></div>` : '<div class="chapter-preview"></div>'}
+              <input type="hidden" class="chapter-image-url" value="${ch.image||''}">
+              <button class="btn btn-danger" onclick="this.parentElement.remove()" style="margin-top:1rem;">Remove Chapter</button>
+            `;
+            document.getElementById('chapters').appendChild(div);
+          });
+        }
+      }
+    };
+
+    window.addChapter = () => {
+      const div = document.createElement('div'); div.className = 'chapter';
+      div.innerHTML = `
+        <input type="text" class="chapter-title" placeholder="Chapter / Poem Title..." style="font-size:1.8rem;width:100%;padding:0.8rem;border:none;border-bottom:2px solid #ccc;margin-bottom:1rem;">
+        <textarea class="chapter-text" placeholder="Write here..." style="width:100%;min-height:300px;padding:1.5rem;border:1px solid #ddd;border-radius:12px;margin:1.5rem 0;font-size:1.1rem;"></textarea>
+        <button class="btn upload-btn" onclick="addImageToChapter(this)">Add Image</button>
+        <div class="chapter-preview"></div>
+        <input type="hidden" class="chapter-image-url">
+        <button class="btn btn-danger" onclick="this.parentElement.remove()" style="margin-top:1rem;">Remove Chapter</button>
+      `;
+      document.getElementById('chapters').appendChild(div);
+    };
+
+    window.saveBook = async () => {
+      const title = document.getElementById('bookTitle').value.trim() || 'Untitled';
+      const cover = document.getElementById('coverUrl').value;
+      const chapters = [];
+      document.querySelectorAll('#chapters .chapter').forEach(el => {
+        const ch = {
+          title: el.querySelector('.chapter-title').value.trim() || 'Untitled',
+          text: el.querySelector('.chapter-text').value,
+          image: el.querySelector('.chapter-image-url').value
+        };
+        if (ch.text.trim() || ch.image) chapters.push(ch);
+      });
+      if (chapters.length === 0) return alert('Add at least one chapter');
+      const book = { title, cover, chapters };
+      try {
+        if (currentBookId) await setDoc(doc(db, 'books', currentBookId), book);
+        else await addDoc(booksRef, book);
+        alert('Published successfully!');
+        document.getElementById('editor').style.display = 'none';
+        loadBooks();
+      } catch (e) { alert('Error: ' + e.message); }
+    };
+
+    window.editBook = id => openEditor(id);
+    window.deleteBook = async id => { if(confirm('Delete forever?')) { await deleteDoc(doc(db,'books',id)); loadBooks(); }};
+
+    document.getElementById('passwordInput').addEventListener('keypress', e => { if(e.key==='Enter') document.getElementById('loginBtn').click(); });
+
+    if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
+    document.getElementById('loginModal').style.display = 'flex';
+  </script>
+</body>
+</html>
